@@ -12,7 +12,6 @@ services:
     env_file:
       - .env.db
     restart: unless-stopped
-    container_name: db
     environment:
       - POSTGRES_INITDB_ARGS=--auth-host=md5 --auth-local=trust
     healthcheck:
