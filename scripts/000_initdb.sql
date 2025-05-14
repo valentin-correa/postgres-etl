@@ -1,7 +1,7 @@
 /*
 Borro las tablas si existen
 */
-DROP TABLE IF EXISTS public.dengue;
+DROP TABLE IF EXISTS public.nacimiento;
 
 DROP TABLE IF EXISTS public.departamento;
 
@@ -14,13 +14,13 @@ Las formas normales son reglas que se aplican a las bases de datos relacionales 
 3. Tercera Forma Normal (3NF): Una tabla está en 3NF si está en 2NF y además, los campos no clave no deben tener dependencias entre sí. Es decir, cada campo no clave debe depender solo de la clave primaria.
 Existen formas normales más avanzadas como la Cuarta Forma Normal (4NF), Quinta Forma Normal (5NF) o la Forma Normal de Boyce-Codd (BCNF), pero las tres primeras son las más utilizadas y suelen ser suficientes para la mayoría de las aplicaciones.
 */
-CREATE TABLE public.dengue (
+CREATE TABLE public.nacimiento (
     id serial,
-    evento VARCHAR,
-    anio BIGINT,
-    grupo_etario VARCHAR,
-    cantidad BIGINT,
-    departamento_id BIGINT
+    departamento_id INTEGER
+    anio INTEGER,
+    cantidad_nacimientos INTEGER,
+    poblacion_total INTEGER,
+    tbn FLOAT
 );
 
 CREATE TABLE public.departamento (
@@ -45,7 +45,8 @@ CREATE TABLE public.provincia (
 /*
 Agrego las restricciones de clave primaria y foránea a las tablas
 */
-ALTER TABLE public.dengue ADD CONSTRAINT pk_dengue PRIMARY KEY (id);
+ALTER TABLE public.nacimiento
+ADD CONSTRAINT pk_nacimiento PRIMARY KEY (id);
 
 ALTER TABLE public.provincia
 ADD CONSTRAINT pk_provincia PRIMARY KEY (id);
@@ -56,8 +57,8 @@ ADD CONSTRAINT pk_departamento PRIMARY KEY (id);
 ALTER TABLE public.departamento
 ADD CONSTRAINT fk_departamento_provincia FOREIGN KEY (provincia_id) REFERENCES provincia (id);
 
-ALTER TABLE public.dengue
-ADD CONSTRAINT fk_dengue_departamento FOREIGN KEY (departamento_id) REFERENCES departamento (id);
+ALTER TABLE public.nacimiento
+ADD CONSTRAINT fk_nacimiento_departamento FOREIGN KEY (departamento_id) REFERENCES departamento (id);
 
 /*
 Creo las tablas temporales para cargar los datos
@@ -87,17 +88,15 @@ CREATE TEMPORARY TABLE provincias_temp (
     nombre_completo VARCHAR
 );
 
-CREATE TEMPORARY TABLE temp_dengue (
-    id_depto_indec_residencia INT,
-    departamento_residencia VARCHAR(255),
-    id_prov_indec_residencia INT,
-    provincia_residencia VARCHAR(255),
-    anio_min INT,
-    evento VARCHAR(255),
-    id_grupo_etario INT,
-    grupo_etario VARCHAR(255),
-    sepi_min INT,
-    cantidad INT
+CREATE TEMPORARY TABLE temp_nacimiento (
+    provincia_id INTEGER,
+    provincia_nombre VARCHAR,
+    departamento_id INTEGER,
+    departamento_nombre VARCHAR,
+    anio INTEGER,
+    nacimientos_cantidad INTEGER,
+    poblacion_total INTEGER,
+    tbn FLOAT
 );
 
 /*
@@ -147,8 +146,8 @@ SELECT
     provincia_id::INTEGER
 FROM temp_departamentos;
 
-COPY temp_dengue
-FROM '/datos/informacion-publica-dengue-zika-nacional-se-1-a-15-de-2024-2024-04-24.csv' DELIMITER ';' CSV HEADER;
+COPY temp_nacimiento
+FROM '/datos/nacimientos_por_departamento_y_anio_2012_2022.csv' DELIMITER ',' CSV HEADER;
 
 /*
 Cargo los datos en las tablas definitivas
@@ -156,11 +155,11 @@ Cargo los datos en las tablas definitivas
 INSERT INTO
     public.provincia (id, nombre)
 SELECT DISTINCT
-    id_prov_indec_residencia,
-    provincia_residencia
-FROM temp_dengue
+    provincia_id,
+    provincia_nombre
+FROM temp_nacimiento
 WHERE
-    id_prov_indec_residencia NOT IN (
+    provincia_id NOT IN (
         SELECT id
         FROM public.provincia
     );
@@ -168,27 +167,27 @@ WHERE
 INSERT INTO
     public.departamento (id, nombre)
 SELECT DISTINCT
-    id_depto_indec_residencia,
-    departamento_residencia
-FROM temp_dengue
+    departamento_id,
+    departamento_nombre
+FROM temp_nacimiento
 WHERE
-    id_depto_indec_residencia NOT IN (
+    departamento_id NOT IN (
         SELECT id
         FROM public.departamento
     );
 
 INSERT INTO
-    public.dengue (
-        evento,
+    public.nacimiento (
+        departamento_id,
         anio,
-        grupo_etario,
-        cantidad,
-        departamento_id
+        cantidad_nacimientos,
+        poblacion_total,
+        tbn 
     )
 SELECT
-    evento,
-    anio_min,
-    grupo_etario,
-    cantidad,
-    id_depto_indec_residencia
-FROM temp_dengue;
+    departamento_id,
+    anio,
+    nacimientos_cantidad,
+    poblacion_total,
+    tbn
+FROM temp_nacimiento;
