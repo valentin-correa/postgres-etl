@@ -16,7 +16,8 @@ Existen formas normales más avanzadas como la Cuarta Forma Normal (4NF), Quinta
 */
 CREATE TABLE public.nacimiento (
     id serial,
-    departamento_id INTEGER
+    departamento_id INTEGER,
+    provincia_id INTEGER,
     anio INTEGER,
     cantidad_nacimientos INTEGER,
     poblacion_total INTEGER,
@@ -89,9 +90,9 @@ CREATE TEMPORARY TABLE provincias_temp (
 );
 
 CREATE TEMPORARY TABLE temp_nacimiento (
-    provincia_id INTEGER,
+    provincia_id TEXT,
     provincia_nombre VARCHAR,
-    departamento_id INTEGER,
+    departamento_id TEXT,
     departamento_nombre VARCHAR,
     anio INTEGER,
     nacimientos_cantidad INTEGER,
@@ -115,7 +116,7 @@ INSERT INTO
         categoria
     )
 SELECT
-    id::INTEGER,
+    CASE WHEN id = 'NA' THEN 46 ELSE id::INTEGER END,
     nombre,
     nombre_completo,
     centroide_lat,
@@ -146,12 +147,19 @@ SELECT
     provincia_id::INTEGER
 FROM temp_departamentos;
 
+/* 
+Debemos insertar el departamento con id = 0 para casos especiales (por ejemplo, Ciudad Autónoma de Buenos Aires).
+*/
+INSERT INTO public.departamento (id, nombre) VALUES (0, 'No definido');
+
 COPY temp_nacimiento
 FROM '/datos/nacimientos_por_departamento_y_anio_2012_2022.csv' DELIMITER ',' CSV HEADER;
 
 /*
 Cargo los datos en las tablas definitivas
 */
+
+/*
 INSERT INTO
     public.provincia (id, nombre)
 SELECT DISTINCT
@@ -175,6 +183,7 @@ WHERE
         SELECT id
         FROM public.departamento
     );
+*/
 
 INSERT INTO
     public.nacimiento (
@@ -185,7 +194,10 @@ INSERT INTO
         tbn 
     )
 SELECT
-    departamento_id,
+    CASE
+        WHEN departamento_id = 'NA' THEN 0
+        ELSE departamento_id::INTEGER
+    END,
     anio,
     nacimientos_cantidad,
     poblacion_total,
