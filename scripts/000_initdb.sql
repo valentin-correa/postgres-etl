@@ -189,7 +189,7 @@ WHERE
 Agrego casos excepcionales a la tabla de departamentos
 */
 
-INSERT INTO public.departamento (id, nombre, provincia_id) VALUES
+INSERT INTO public.departamento (id, nombre, provincia_id) VALUES   
 (9999, 'Ciudad Autónoma de Buenos Aires', 2), (9998, 'No definido en La Rioja', 46);
 
 INSERT INTO
