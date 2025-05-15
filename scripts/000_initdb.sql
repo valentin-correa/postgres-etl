@@ -88,7 +88,7 @@ CREATE TEMPORARY TABLE provincias_temp (
     nombre VARCHAR,
     nombre_completo VARCHAR
 );
-
+    
 CREATE TEMPORARY TABLE temp_nacimiento (
     provincia_id TEXT,
     provincia_nombre VARCHAR,
@@ -116,7 +116,7 @@ INSERT INTO
         categoria
     )
 SELECT
-    CASE WHEN id = 'NA' THEN 46 ELSE id::INTEGER END,
+    id::INTEGER,
     nombre,
     nombre_completo,
     centroide_lat,
@@ -185,6 +185,13 @@ WHERE
     );
 */
 
+/*
+Agrego casos excepcionales a la tabla de departamentos
+*/
+
+INSERT INTO public.departamento (id, nombre, provincia_id) VALUES
+(9999, 'Ciudad Autónoma de Buenos Aires', 2), (9998, 'No definido en La Rioja', 46);
+
 INSERT INTO
     public.nacimiento (
         departamento_id,
@@ -194,10 +201,11 @@ INSERT INTO
         tbn 
     )
 SELECT
-    CASE
-        WHEN departamento_id = 'NA' THEN 0
+    CASE 
+        WHEN departamento_id = 'NA' AND provincia_id = 'NA' THEN 9998 /* Información de la provincia "La Rioja" */
+        WHEN departamento_id = 'NA' AND provincia_id::INTEGER = 2 THEN 9999 /* Información de la provincia "Buenos Aires" */ 
         ELSE departamento_id::INTEGER
-    END,
+    END AS departamento_id,
     anio,
     nacimientos_cantidad,
     poblacion_total,
