@@ -17,7 +17,6 @@ Existen formas normales más avanzadas como la Cuarta Forma Normal (4NF), Quinta
 CREATE TABLE public.nacimiento (
     id serial,
     departamento_id INTEGER,
-    provincia_id INTEGER,
     anio INTEGER,
     cantidad_nacimientos INTEGER,
     poblacion_total INTEGER,
@@ -88,7 +87,7 @@ CREATE TEMPORARY TABLE provincias_temp (
     nombre VARCHAR,
     nombre_completo VARCHAR
 );
-    
+
 CREATE TEMPORARY TABLE temp_nacimiento (
     provincia_id TEXT,
     provincia_nombre VARCHAR,
@@ -150,7 +149,9 @@ FROM temp_departamentos;
 /* 
 Debemos insertar el departamento con id = 0 para casos especiales (por ejemplo, Ciudad Autónoma de Buenos Aires).
 */
-INSERT INTO public.departamento (id, nombre) VALUES (0, 'No definido');
+INSERT INTO
+    public.departamento (id, nombre)
+VALUES (0, 'No definido');
 
 COPY temp_nacimiento
 FROM '/datos/nacimientos_por_departamento_y_anio_2012_2022.csv' DELIMITER ',' CSV HEADER;
@@ -160,37 +161,21 @@ Cargo los datos en las tablas definitivas
 */
 
 /*
-INSERT INTO
-    public.provincia (id, nombre)
-SELECT DISTINCT
-    provincia_id,
-    provincia_nombre
-FROM temp_nacimiento
-WHERE
-    provincia_id NOT IN (
-        SELECT id
-        FROM public.provincia
-    );
-
-INSERT INTO
-    public.departamento (id, nombre)
-SELECT DISTINCT
-    departamento_id,
-    departamento_nombre
-FROM temp_nacimiento
-WHERE
-    departamento_id NOT IN (
-        SELECT id
-        FROM public.departamento
-    );
-*/
-
-/*
 Agrego casos excepcionales a la tabla de departamentos
 */
 
-INSERT INTO public.departamento (id, nombre, provincia_id) VALUES   
-(9999, 'Ciudad Autónoma de Buenos Aires', 2), (9998, 'No definido en La Rioja', 46);
+INSERT INTO
+    public.departamento (id, nombre, provincia_id)
+VALUES (
+        9999,
+        'Ciudad Autónoma de Buenos Aires',
+        2
+    ),
+    (
+        9998,
+        'No definido en La Rioja',
+        46
+    );
 
 INSERT INTO
     public.nacimiento (
@@ -198,12 +183,14 @@ INSERT INTO
         anio,
         cantidad_nacimientos,
         poblacion_total,
-        tbn 
+        tbn
     )
 SELECT
-    CASE 
-        WHEN departamento_id = 'NA' AND provincia_id = 'NA' THEN 9998 /* Información de la provincia "La Rioja" */
-        WHEN departamento_id = 'NA' AND provincia_id::INTEGER = 2 THEN 9999 /* Información de la provincia "Buenos Aires" */ 
+    CASE
+        WHEN departamento_id = 'NA'
+        AND provincia_id = 'NA' THEN 9998 /* Información de la provincia "La Rioja" */
+        WHEN departamento_id = 'NA'
+        AND provincia_id::INTEGER = 2 THEN 9999 /* Información de la provincia "Buenos Aires" */
         ELSE departamento_id::INTEGER
     END AS departamento_id,
     anio,
