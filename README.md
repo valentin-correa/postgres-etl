@@ -190,10 +190,10 @@ ORDER BY "Total Nacimientos 2012-2022";
 
 6. **Creación de Gráficos y Tableros**
 
-1. Si aún no lo hiciste, ejecuta las consultas del paso anterior en ***`SQL Lab`*** de Apache Superset.
-2. Haz clic en el botón ***`CREATE CHART`*** para crear gráficos interactivos.
-3. Configura el tipo de gráfico y las dimensiones necesarias.
-4. Si lo deseas, guarda el gráfico en un tablero con el botón ***`SAVE`***.
+- Si aún no lo hiciste, ejecuta las consultas del paso anterior en ***`SQL Lab`*** de Apache Superset.
+- Haz clic en el botón ***`CREATE CHART`*** para crear gráficos interactivos.
+- Configura el tipo de gráfico y las dimensiones necesarias.
+- Si lo deseas, guarda el gráfico en un tablero con el botón ***`SAVE`***.
 
 ## **¡Gracias por llegar hasta el final!**
 
