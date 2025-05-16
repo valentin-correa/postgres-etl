@@ -1,68 +1,63 @@
-# **ETL para la carga de *`datasets`* de DENGUE en Argentina**
+# **ETL para la carga de *`datasets`* de Nacimientos en Argentina (2012-2022)**
 
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
 ![Apache Superset](https://img.shields.io/badge/Apache_Superset-FF5733?style=for-the-badge&logo=apache-superset&logoColor=white)
 ![pgAdmin](https://img.shields.io/badge/pgAdmin-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+## **Descripción del Proyecto**
+El objetivo de este proyecto es llevar a cabo un proceso ETL(Extract, Transform, Load) a partir de un conjunto de archivos en formato CSV que presentan información sobre la cantidad anual de nacimientos en Argentina entre los años 2012 y 2022, clasificada por departamento y provincia.
+Obtendremos en pocos pasos una base de datos relacional con toda la información relevante provista, permitiendo realizar todo tipo de consultas sobre la misma y hasta pudiendo generar gráficos con sus resultados mediante distintas herramientas.
+Llevaremos a cabo el ETL de manera "manual", es decir, implementandolo directamente con SQL en PostgreSQL, en lugar de usar un lenguaje como Python o una herramienta específica de ETL
+A continuación explicamos el paso a paso para poder reproducir y utilizar esta base de datos, empleando tan solo los archivos que se encuentran en este repositorio. 
 
-## **Descarga de Datasets**
+## **Participantes del proyecto**
+Barrionuevo, Imanol - barrionuevoimanol@gmail.com 
+Broilo, Mateo José - broilomateo@gmail.com
+Correa, Valentín - correavale2004@gmail.com 
+Díaz, Gabriel - gabidiaz4231@gmail.com 
+Gambino, Tomás - tomigambino21@gmail.com 
+Gomez, Andrés - andresgf925@gmail.com 
+Letona, Mateo - mateolet883@gmail.com 
+Wursten Gill, Santiago - santiwgwuri@gmail.com 
 
-Los datasets utilizados en este proyecto pueden descargarse desde el portal oficial de datos abiertos del gobierno de Argentina:  
+## **Datasets utilizados**
+Para este proyecto hacemos uso de 3 data sets: 
+- Nacimientos en Argentina por departamento (2012 - 2022)
+- Departamentos
+- Provincias
+Estos archivos csv, y muchisimos más con información de distintas categorías, pueden descargarse desde el portal oficial de datos abiertos del gobierno de Argentina, el cual proporciona información pública en formatos reutilizables:  
 [https://datos.gob.ar/dataset](https://datos.gob.ar/dataset)
-
-Este portal proporciona información pública en formatos reutilizables, incluyendo datos relacionados con casos de dengue en Argentina.
+Sin embargo, cabe aclarar que ya se encuentran en el repositorio, por lo que no será necesaria su descarga por separado. 
 
 ## **Resumen del Tutorial**
 
-Este tutorial guía al usuario a través de los pasos necesarios para desplegar una infraestructura ETL utilizando Docker, PostgreSQL, Apache Superset y pgAdmin. Se incluyen instrucciones detalladas para:
+Como dijimos, explicaremos el paso a paso para poder reproducir el proyecto, desde la configuración hasta la creación de tableros gráficos.
 
-1. Levantar los servicios con Docker.
-2. Configurar la conexión a la base de datos en Apache Superset.
-3. Ejecutar consultas SQL para analizar los datos de casos de dengue.
-4. Crear gráficos y tableros interactivos para la visualización de datos.
+1. Clonar el repositorio.
+2. Configurar archivos necesarios.
+3. Levantar los servicios con Docker.
+4. Configurar la conexión a la base de datos en Apache Superset.
+5. Ejecutar consultas SQL con Superset para obtener la información deseada.
+6. Crear gráficos y tableros interactivos para visualizar los datos obtenidos en las consultas.
 
-## **Palabras Clave**
+## **Para tener en cuenta**
 
-- Docker
-- PostgreSQL
-- Apache Superset
-- pgAdmin
-- ETL
-- Visualización de Datos
-
-## **Mantenido Por**
-
-**PINDU**
-
-## **Descargo de Responsabilidad**
-
-El código proporcionado se ofrece "tal cual", sin garantía de ningún tipo, expresa o implícita. En ningún caso los autores o titulares de derechos de autor serán responsables de cualquier reclamo, daño u otra responsabilidad.
-
-
-## **Descripción del Proyecto**
-
-Este proyecto implementa un proceso ETL (Extract, Transform, Load) para la carga y análisis de datos relacionados con casos de dengue en Argentina. Utiliza herramientas modernas como Docker, PostgreSQL, Apache Superset y pgAdmin para facilitar la gestión, análisis y visualización de datos.
-
-El objetivo principal es proporcionar una solución escalable y reproducible para analizar datos de dengue por grupo etario, departamento y provincia, permitiendo la creación de tableros interactivos y gráficos personalizados.
-
-## **Características Principales**
-
-- **Infraestructura Contenerizada:** Uso de Docker para simplificar la configuración y despliegue.
-- **Base de Datos Relacional:** PostgreSQL para almacenar y gestionar los datos.
-- **Visualización de Datos:** Apache Superset para crear gráficos y tableros interactivos.
-- **Gestión de Base de Datos:** pgAdmin para administrar y consultar la base de datos.
-
-## **Requisitos Previos**
-
-Antes de comenzar, asegúrate de tener instalados los siguientes componentes:
+Será necesario antes de comenzar tener instalados los siguientes componentes:
 
 - [Docker](https://www.docker.com/)
 - [Docker Compose](https://docs.docker.com/compose/)
 - Navegador web para acceder a Apache Superset y pgAdmin.
 
-## **Servicios Definidos en Docker Compose**
+Además, deberá tener Git y Github correctamente configurados para poder clonar el repositorio.
 
-El archivo `docker-compose.yml` define los siguientes servicios:
+## **Definición de servicios en Docker Compose**
+
+En el archivo `docker-compose.yml`, a partir del cual levantaremos los contenedores necesarios para este proyecto, definimos tres servicios:
+-Base de datos (PostgreSQL), un sistema de gestión de bases de datos relacional (RDBMS) de código abierto.
+-Apache Superset, una plataforma moderna de visualización de datos y BI (business intelligence).
+-PgAdmin, una herramienta de administración web para PostgreSQL.
+
+Las características de estos servicios se especifican en el archivo como se ve a continuación:
 
 1. **Base de Datos (PostgreSQL):**
    - Imagen: `postgres:alpine`
@@ -94,16 +89,18 @@ El archivo `docker-compose.yml` define los siguientes servicios:
    - Variables de entorno:
      - Configuradas en el archivo `.env.db`
 
-## **Instrucciones de Configuración**
+## **Instrucciones**
+A continuación se presentan los comandos que se deben ejecutar en la terminal y tareas a realizar para llevar a cabo cada paso.
 
 1. **Clonar el repositorio:**
    ```sh
    git clone <URL_DEL_REPOSITORIO>
    cd postgres-etl
    ```
+   Esto será suficiente para disponer de todos los archivos necesarios para la ejecución del proyecto. Alternativamente podría descargar los archivos manualmente desde el repositorio de github.
 
 2. **Configurar el archivo `.env.db`:**
-   Crea un archivo `.env.db` en la raíz del proyecto con las siguientes variables de entorno:
+   Si no se encuentra en el repositorio al momento de clonarlo, crea un archivo `.env.db` en la raíz del proyecto con las siguientes variables de entorno:
    ```env
     #Definimos cada variable
     DATABASE_HOST=db
@@ -121,6 +118,7 @@ El archivo `docker-compose.yml` define los siguientes servicios:
     # Configuracion para inicializar superset
     SUPERSET_SECRET_KEY=your_secret_key_here
    ```
+   Este archivo será necesario al momento de levantar los servicios.
 
 3. **Levantar los servicios:**
    Ejecuta los siguientes comandos para iniciar los contenedores:
